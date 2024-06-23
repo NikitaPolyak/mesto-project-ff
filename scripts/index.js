@@ -8,6 +8,7 @@ function createCard(element, deleteCard){
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
   const cardDelete = cardElement.querySelector('.card__delete-button');
   cardElement.querySelector('.card__image').src = element.link;
+  cardElement.querySelector('.card__image').alt = element.name;
   cardElement.querySelector('.card__title').textContent = element.name;
   cardDelete.addEventListener('click', deleteCard);
   return cardElement;
