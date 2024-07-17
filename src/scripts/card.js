@@ -14,7 +14,6 @@ const createCard = (element, deleteCard, addLikeCard, openCard) => {
   cardImage.addEventListener('click', ()=> {openCard(element)});
   return cardElement;
 }
-
 //Функция лайка карточки
 const addLikeCard = (evt) => {
   evt.classList.toggle('card__like-button_is-active');

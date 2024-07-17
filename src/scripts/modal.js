@@ -1,4 +1,3 @@
-
 //Функция открытия модального окна
 const openModal = (popup) => {
   popup.classList.add('popup_is-opened');
