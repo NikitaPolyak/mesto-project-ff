@@ -2,11 +2,15 @@
 const openModal = (popup) => {
   popup.classList.add('popup_is-opened');
   popup.classList.add('popup_is-animated');
+  document.addEventListener('keydown', closeByEscape);
+  popup.addEventListener('click', closeModalOverlay);
 };
 
 //Функция закрытия модального окна
 const closeModal = (popup) => {
   popup.classList.remove('popup_is-opened');
+  document.removeEventListener('keydown', closeByEscape);
+  popup.removeEventListener('click', closeModalOverlay);
 };
 
 //Функция закрытия модального окна при клике на overlay
@@ -15,16 +19,11 @@ const closeModalOverlay = (evt) => {
       closeModal(evt.currentTarget);
     };
   }
+//Функция закрытия модальных окон при нажатии на ESC
+function closeByEscape(event) {
+  if(event.key === 'Escape') {
+     closeModal(document.querySelector('.popup_is-opened'));
+  }
+}
 
-  //Функция открытия карточки
-  const openCard = (elem) => {
-    const popupCaption = document.querySelector('.popup__caption');
-    const openImageCardPopup = document.querySelector('.popup__image');
-    const imageModal = document.querySelector('.popup_type_image');
-    openImageCardPopup.src = elem.link;
-    openImageCardPopup.alt = elem.name;
-    popupCaption.textContent = elem.name;
-    openModal(imageModal);
-    };
-
-export {openModal, closeModal, closeModalOverlay, openCard};
+export {openModal, closeModal};
