@@ -4,6 +4,7 @@ const openModal = (popup) => {
   popup.classList.add('popup_is-animated');
   document.addEventListener('keydown', closeByEscape);
   popup.addEventListener('click', closeModalOverlay);
+
 };
 
 //Функция закрытия модального окна

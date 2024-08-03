@@ -4,9 +4,10 @@ const cardTemplate = document.querySelector('#card-template').content;
 const createCard = (element, deleteCard, addLikeCard, openCard) => {
   const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
   const cardImage = cardElement.querySelector('.card__image')
+  const cardTitle = cardElement.querySelector('.card__title')
   cardImage.src = element.link;
   cardImage.alt = element.name;
-  cardImage.textContent = element.name;
+  cardTitle.textContent = element.name;
   const cardDelete = cardElement.querySelector('.card__delete-button');
   const likeCard = cardElement.querySelector('.card__like-button');
   likeCard.addEventListener('click', ()=> {addLikeCard(likeCard)});
