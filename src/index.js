@@ -1,6 +1,6 @@
 import './pages/index.css';
 import { initialCards } from './scripts/cards.js';
-import { createCard, deleteCard, addLikeCard} from './scripts/card.js';
+import { createCard, addLikeCard} from './scripts/card.js';
 import { openModal, closeModal} from './scripts/modal.js';
 // @todo: DOM узлы
 
@@ -24,6 +24,9 @@ const newCardUrlInput = document.querySelector('.popup__input_type_url');
 const popupCaption = document.querySelector('.popup__caption');
 const openImageCardPopup = document.querySelector('.popup__image');
 const imageModal = document.querySelector('.popup_type_image');
+const popupButtonDel = document.querySelector('.popup__button-del')
+const popupDelete = document.querySelector('.popup_delete_card')
+
 
 // @todo: Вывести карточки на страницу
 /*initialCards.forEach(function(element) {
@@ -46,6 +49,14 @@ addCardButton.addEventListener('click', () => {
   })
   openModal(popupAddCard);
 });
+
+//Открытие окна подтверждения удаления карточки
+function deleteMyCardServer(){
+  openImageCardPopup.src = elem.link;
+  openImageCardPopup.alt = elem.name;
+  popupCaption.textContent = elem.name;
+  openModal(imageModal);
+};
 
 //Закрытие модальных окон при клике на крестик
 popupCloseButtonAll.forEach(evt => {
@@ -209,6 +220,7 @@ const validationConfig ={
 // Вызовем функцию
 enableValidation(validationConfig);
 
+//Загрузка информации о пользователе с сервера
 function getInfoUser() {
  fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
     headers: {
@@ -223,7 +235,7 @@ function getInfoUser() {
       console.log(result);
     });
 }
-
+//Загрузка карточек с сервера
 function getCardsServer() {
   fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
     headers: {
@@ -232,7 +244,7 @@ function getCardsServer() {
   })
     .then(res => res.json())
     .then((result) => {
-      //console.log(result);
+      console.log(result);
       result.forEach(function(element) {
         placesList.append(createCard(element, deleteCard, addLikeCard, openCard))
       });
@@ -240,9 +252,9 @@ function getCardsServer() {
 }
 
 const promises = [getInfoUser(), getCardsServer()]
-
 Promise.all(promises)
 
+//Редактирование профиля на сервере
 function updateUserData() {
   fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
     method: 'PATCH',
@@ -256,5 +268,42 @@ function updateUserData() {
     })
   });
 }
-
 updateUserData();
+//Добавление новой карточки с сервера 
+function addNewCard(){
+  fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
+    method: 'POST',
+    headers: {
+      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: 'Камчатка тест',
+      link: 'https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kamchatka.jpg'
+    })
+  });
+}
+//addNewCard();
+
+
+//Удаление карточки с сервера 
+function deleteCard(cardId) {
+  popupDelete.classList.add('popup_is-opened')
+  popupDelete.classList.add('popup_is-animated')
+  popupButtonDel.addEventListener('click', ()=>{
+  fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/${cardId}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: '1408693c-201a-41de-afd2-34fb2c62888a'
+    }
+  /*.then((res)=>res.json())
+    .catch((err)=>console.log('Ощибка:',err))*/
+  })
+  popupDelete.classList.remove('popup_is-opened');
+})
+}
+
+//Отображение количества лайков карточки и подгон к макету расположено в card__description.css
+
+
+

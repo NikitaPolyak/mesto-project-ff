@@ -5,3 +5,8 @@
   background: #fff;
   padding: 25px 20px;
 }
+
+.count__like-card {
+  margin:0;
+  margin-left: 6px;
+}
