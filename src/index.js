@@ -1,6 +1,6 @@
 import './pages/index.css';
 import { initialCards } from './scripts/cards.js';
-import { createCard, addLikeCard} from './scripts/card.js';
+import { createCard, addLikeCard, deleteCard,handleResponse} from './scripts/card.js';
 import { openModal, closeModal} from './scripts/modal.js';
 // @todo: DOM узлы
 
@@ -19,19 +19,18 @@ const job = document.querySelector('.profile__description');
 const avatar = document.querySelector('.profile__image');
 const formEditProfile = document.forms['edit-profile'];
 const formNewCard = document.forms['new-place'];
+const formNewAvatar = document.forms['new-avatar'];
 const newCardNameInput = document.querySelector('.popup__input_type_card-name');
 const newCardUrlInput = document.querySelector('.popup__input_type_url');
 const popupCaption = document.querySelector('.popup__caption');
 const openImageCardPopup = document.querySelector('.popup__image');
 const imageModal = document.querySelector('.popup_type_image');
-const popupButtonDel = document.querySelector('.popup__button-del')
-const popupDelete = document.querySelector('.popup_delete_card')
+const popupButtonDel = document.querySelector('.popup__button-del');
+const popupDelete = document.querySelector('.popup_delete_card');
+const popupAva = document.querySelector('.popup_type_new-avatar');
+const inputLinkAva = formElement.querySelector('.popup_type_link-new-avatar'); 
+const buttonElement = document.querySelectorAll('.popup__button');
 
-
-// @todo: Вывести карточки на страницу
-/*initialCards.forEach(function(element) {
-  placesList.append(createCard(element, deleteCard, addLikeCard, openCard))
-});*/
 
 //Открытие окна редактирования профиля
 profileEditButton.addEventListener('click', () => {
@@ -42,7 +41,7 @@ profileEditButton.addEventListener('click', () => {
 
 //Открытие окна добавления карточки
 addCardButton.addEventListener('click', () => {
-  const buttonElement = Array.from(document.querySelectorAll('.popup__button'));
+  //const buttonElement = Array.from(document.querySelectorAll('.popup__button'));
   buttonElement.forEach((elem)=>{
     elem.classList.add('popup__button_disabled');
     elem.disabled = true;
@@ -51,12 +50,12 @@ addCardButton.addEventListener('click', () => {
 });
 
 //Открытие окна подтверждения удаления карточки
-function deleteMyCardServer(){
+/*function deleteMyCardServer(){
   openImageCardPopup.src = elem.link;
   openImageCardPopup.alt = elem.name;
   popupCaption.textContent = elem.name;
   openModal(imageModal);
-};
+};*/
 
 //Закрытие модальных окон при клике на крестик
 popupCloseButtonAll.forEach(evt => {
@@ -64,7 +63,7 @@ popupCloseButtonAll.forEach(evt => {
     const closePopup = evt.closest('.popup');
     closeModal(closePopup);
     const inputList = Array.from(formElement.querySelectorAll('.popup__input'));
-    const buttonElement = document.querySelector('.popup__button')
+    //const buttonElement = document.querySelector('.popup__button')
     inputList.forEach((inputElement) => {
       hideInputError(formElement,inputElement);
     })
@@ -100,9 +99,52 @@ function openCard(elem){
   openModal(imageModal);
 };
 
+//Функция изменения аватара
+const updateAvatar = (evt) => {
+  //const link = inputLinkAva.value // ошибка на value
+  evt.preventDefault();
+  fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me/avatar', {
+    method: 'PATCH',
+    headers: {
+      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      avatar: 'https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kamchatka.jpg'
+    })
+  })
+  .then(handleResponse)
+  
+  console.log('asdasdasd')
+  avatar.style =`background-image: url('https://pictures.s3.yandex.net/frontend-developer/cards-compressed/kamchatka.jpg');`
+  closeModal(popupAva)
+}
+
 formEditProfile.addEventListener('submit', handleFormSubmit);
 formNewCard.addEventListener('submit', handleFormNewCardSubmit);
 
+//Открытие окна редактирования аватарки
+avatar.addEventListener('click', ()=>{
+  openModal(popupAva)
+  formNewAvatar.addEventListener('submit', updateAvatar)
+ })
+
+//Редактирование профиля на сервере
+function updateUserData() {
+  fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
+    method: 'PATCH',
+    headers: {
+      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: 'Marie Skłodowska Curie',
+      about: 'Physicist and Chemist',
+    })
+  })
+  .then(handleResponse)
+}
+updateUserData() 
 
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -220,55 +262,42 @@ const validationConfig ={
 // Вызовем функцию
 enableValidation(validationConfig);
 
-//Загрузка информации о пользователе с сервера
-function getInfoUser() {
- fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a'
-    }
-  })
-    .then(res => res.json())
-    .then((result) => {
-      title.textContent = result.name
-      job.textContent = result.about
-      avatar.src = result.avatar
-      console.log(result);
-    });
-}
 //Загрузка карточек с сервера
 function getCardsServer() {
-  fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
+  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
     headers: {
       authorization: '1408693c-201a-41de-afd2-34fb2c62888a'
     }
   })
-    .then(res => res.json())
-    .then((result) => {
-      console.log(result);
-      result.forEach(function(element) {
-        placesList.append(createCard(element, deleteCard, addLikeCard, openCard))
-      });
-    });
+  .then(handleResponse)
 }
-
-const promises = [getInfoUser(), getCardsServer()]
-Promise.all(promises)
-
-//Редактирование профиля на сервере
-function updateUserData() {
-  fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
-    method: 'PATCH',
+//Загрузка информации о пользователе с сервера
+function getInfoUser() {
+ return fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
     headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: 'Marie Skłodowska Curie',
-      about: 'Physicist and Chemist'
-    })
-  });
+      authorization: '1408693c-201a-41de-afd2-34fb2c62888a'
+    }
+  })
+  .then(handleResponse)
 }
-updateUserData();
+function getInfoUserAndCards(){
+  const promises = [getInfoUser(), getCardsServer()]
+  return Promise.all(promises)
+  .then(([userData, cardsData]) => {
+    console.log(userData)
+    title.textContent = userData.name
+    job.textContent = userData.about
+    avatar.src = userData.avatar
+
+    cardsData.forEach(function(element) {
+      placesList.append(createCard(element, deleteCard, addLikeCard, openCard))
+    })
+  }
+)
+}
+getInfoUserAndCards()
+
+
 //Добавление новой карточки с сервера 
 function addNewCard(){
   fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
@@ -285,23 +314,6 @@ function addNewCard(){
 }
 //addNewCard();
 
-
-//Удаление карточки с сервера 
-function deleteCard(cardId) {
-  popupDelete.classList.add('popup_is-opened')
-  popupDelete.classList.add('popup_is-animated')
-  popupButtonDel.addEventListener('click', ()=>{
-  fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/${cardId}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a'
-    }
-  /*.then((res)=>res.json())
-    .catch((err)=>console.log('Ощибка:',err))*/
-  })
-  popupDelete.classList.remove('popup_is-opened');
-})
-}
 
 //Отображение количества лайков карточки и подгон к макету расположено в card__description.css
 

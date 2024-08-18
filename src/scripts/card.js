@@ -14,41 +14,84 @@ const createCard = (element, deleteCard, addLikeCard, openCard) => {
   const likeCard = cardElement.querySelector('.card__like-button');
   if(element.owner._id != '843c134335734d707123b1b1')
     cardDelete.classList.add('card__delete-button-remove')
-  likeCard.addEventListener('click', ()=> {addLikeCard(likeCard)});
-  //КАК ИСПОЛЬЗОВАТЬ ФУНКЦИИ НЕ В ФАЙЛЕ INDEX.JS openModal()
-  cardDelete.addEventListener('click', (evt)=>{
-      deleteCard(element._id)
-      /*Ну у тебя есть запрос на сервер, который удаляет карточку. Это функция, где ты вызываешь fetch. Эта функция вовзращает промис и значит на неё можно подписаться через then
-      Вызывая любую функцию, которая возвращает промис, ты можешь написать после вызова .then и это действие будет отрабатывать только после выполнения промиса
-        .then(()=>{
-          const evtTarget = evt.target.closest('.card')
-          evtTarget.remove() 
-        })*/
+  likeCard.addEventListener('click', (evt)=>{addLikeCard(evt,element,countLike)})
+  cardDelete.addEventListener('click', (evt)=> {
+    deleteCard(element._id)
+    .then(()=>{
       const evtTarget = evt.target.closest('.card')
       evtTarget.remove()
-  })
+    })
+})
   cardImage.addEventListener('click', ()=> {openCard(element)});
   return cardElement;
 }
 //Функция лайка карточки
-const addLikeCard = (evt) => {
-  evt.classList.toggle('card__like-button_is-active');
+const addLikeCard = (evt,element,countLike) => {
+  const likeButton = evt.target
+  const cardId = element._id
+  if(!likeButton.classList.contains('card__like-button_is-active'))
+    {
+      addLikeCardServer(cardId)
+      .then((res)=>{
+        likeButton.classList.add('card__like-button_is-active')
+        countLike.textContent = res.likes.length
+      })
+    }
+  else {
+    removeLikeCardServer(cardId)
+    .then((res)=>{
+      likeButton.classList.remove('card__like-button_is-active')
+      countLike.textContent = res.likes.length
+    })
+  }
 };
-
-function addLikeCardServer(){
-  fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/cardId', {
+//Функция обработки response
+function handleResponse(res){
+  if(res.ok){
+    //УДАЛИТЬ ТЕСТ
+    console.log('Проверка ответа сервера')
+    return res.json()
+  }
+  else {
+    return Promise.reject(`Ошибка: ${res.status}`)
+  }
+}
+function addLikeCardServer(cardId){
+  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/${cardId}`, {
     method: 'PUT',
     headers: {
       authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
+      'Content-Type': 'application/json'
     }
-  });
+  })
+  .then(handleResponse)
 }
-function removeLikeCardServer(){
-  fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/cardId', {
+function removeLikeCardServer(cardId){
+  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/${cardId}`, {
     method: 'DELETE',
     headers: {
       authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
+      'Content-Type': 'application/json'
     }
-  });
+  })
+  .then(handleResponse)
 }
-export {createCard, addLikeCard};
+
+//Удаление карточки с сервера 
+function deleteCard(cardId) {
+  //popupDelete.classList.add('popup_is-opened')
+  //popupDelete.classList.add('popup_is-animated')
+  //popupButtonDel.addEventListener('click', ()=>{
+  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/${cardId}`, {
+    method: 'DELETE',
+    headers: {
+      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(handleResponse)
+  //popupDelete.classList.remove('popup_is-opened');
+//})
+}
+
+export {createCard,addLikeCard,deleteCard,handleResponse};
