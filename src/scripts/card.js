@@ -1,3 +1,4 @@
+import { addLikeCardServer,removeLikeCardServer,deleteCard } from './api.js';
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
 // @todo: Функция создания карточки
@@ -36,6 +37,9 @@ const addLikeCard = (evt,element,countLike) => {
         likeButton.classList.add('card__like-button_is-active')
         countLike.textContent = res.likes.length
       })
+      .catch((err) => {
+        console.log(err)
+      })
     }
   else {
     removeLikeCardServer(cardId)
@@ -43,55 +47,10 @@ const addLikeCard = (evt,element,countLike) => {
       likeButton.classList.remove('card__like-button_is-active')
       countLike.textContent = res.likes.length
     })
+    .catch((err) => {
+      console.log(err)
+    })
   }
 };
-//Функция обработки response
-function handleResponse(res){
-  if(res.ok){
-    //УДАЛИТЬ ТЕСТ
-    console.log('Проверка ответа сервера')
-    return res.json()
-  }
-  else {
-    return Promise.reject(`Ошибка: ${res.status}`)
-  }
-}
-function addLikeCardServer(cardId){
-  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/${cardId}`, {
-    method: 'PUT',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(handleResponse)
-}
-function removeLikeCardServer(cardId){
-  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/${cardId}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(handleResponse)
-}
 
-//Удаление карточки с сервера 
-function deleteCard(cardId) {
-  //popupDelete.classList.add('popup_is-opened')
-  //popupDelete.classList.add('popup_is-animated')
-  //popupButtonDel.addEventListener('click', ()=>{
-  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/${cardId}`, {
-    method: 'DELETE',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(handleResponse)
-  //popupDelete.classList.remove('popup_is-opened');
-//})
-}
-
-export {createCard,addLikeCard,deleteCard,handleResponse};
+export {createCard,addLikeCard,deleteCard};
