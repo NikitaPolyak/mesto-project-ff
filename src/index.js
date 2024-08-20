@@ -18,15 +18,18 @@ const job = document.querySelector('.profile__description');
 const avatar = document.querySelector('.profile__image');
 const formEditProfile = document.forms['edit-profile'];
 const formNewCard = document.forms['new-place'];
+const formNewAvatar = document.forms['new-avatar'];
 const newCardNameInput = document.querySelector('.popup__input_type_card-name');
 const newCardUrlInput = document.querySelector('.popup__input_type_url');
 const popupCaption = document.querySelector('.popup__caption');
 const openImageCardPopup = document.querySelector('.popup__image');
 const imageModal = document.querySelector('.popup_type_image');
 const buttonElement = document.querySelectorAll('.popup__button');
+const buttonEditProfile = formEditProfile.querySelector('.popup__button');
+const buttonNewAvatar = formNewAvatar.querySelector('.popup__button');
+const buttonNewCard = formNewCard.querySelector('.popup__button');
 
 const popupAva = document.querySelector('.popup_type_new-avatar');
-const formNewAvatar = document.forms['new-avatar'];
 const inputLinkAva = formNewAvatar.querySelector('.popup_type_link-new-avatar'); 
 
 
@@ -62,7 +65,7 @@ profileEditButton.addEventListener('click', () => {
 //Отправка формы и изменение профиля
 const handleFormSubmit = (evt) => {
   evt.preventDefault();
-  /*Функция смены статуса кнопки*/
+  updateStatusButton(buttonEditProfile, true)
   updateUserData(nameInput.value, jobInput.value)
   .then((data)=>{
     title.textContent = data.name
@@ -73,6 +76,10 @@ const handleFormSubmit = (evt) => {
   .catch((err) => {
     console.log(err)
   })
+  .finally(()=>{
+    updateStatusButton(buttonEditProfile, false)
+  })
+  
 };
 
 formEditProfile.addEventListener('submit', handleFormSubmit);
@@ -86,14 +93,18 @@ avatar.addEventListener('click', ()=>{
 
 //Функция изменения аватара
 const updateAvatar = (evt) => {
-  /*Функция смены статуса кнопки*/
+  updateStatusButton(buttonNewAvatar, true)
   updateAvatarServer(inputLinkAva.value)
   .then((data)=>{
+  console.log(data)
   avatar.style = `background-image: url('${data.avatar}');`
   closeModal(popupAva)
   })
   .catch((err) => {
     console.log(err)
+  })
+  .finally(()=>{
+    updateStatusButton(buttonNewAvatar, false)
   })
 }
 
@@ -112,7 +123,7 @@ addCardButton.addEventListener('click', () => {
 //Добавление карточки
 const handleFormNewCardSubmit = (evt) => {
   evt.preventDefault();
-  /*Функция смены статуса кнопки*/
+  updateStatusButton(buttonNewCard, true)
   const newCard = {name:newCardNameInput.value, link:newCardUrlInput.value};
   addNewCard(newCard)
   .then((data)=>{
@@ -125,9 +136,18 @@ const handleFormNewCardSubmit = (evt) => {
   .catch((err) => {
     console.log(err)
   })
+  .finally(()=>{
+    updateStatusButton(buttonNewCard, false)
+  })
 };
 
 formNewCard.addEventListener('submit', handleFormNewCardSubmit);
+
+//Функция смены статуса кнопки при загрузке
+function updateStatusButton(button,status) {
+button.textContent = status ? 'Сохранение...' : 'Сохранить'
+}
+
 
 //Закрытие модальных окон при клике на крестик
 popupCloseButtonAll.forEach(evt => {

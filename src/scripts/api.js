@@ -100,7 +100,7 @@ function deleteCard(cardId) {
 
 //Обновление аватара пользователя на сервере
 function updateAvatarServer(link) {
-  fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me/avatar', {
+  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me/avatar', {
     method: 'PATCH',
     headers: {
       authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
