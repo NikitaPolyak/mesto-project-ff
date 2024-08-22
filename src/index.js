@@ -25,7 +25,6 @@ const newCardUrlInput = document.querySelector('.popup__input_type_url');
 const popupCaption = document.querySelector('.popup__caption');
 const openImageCardPopup = document.querySelector('.popup__image');
 const imageModal = document.querySelector('.popup_type_image');
-const buttonElement = document.querySelectorAll('.popup__button');
 const buttonEditProfile = formEditProfile.querySelector('.popup__button');
 const buttonNewAvatar = formNewAvatar.querySelector('.popup__button');
 const buttonNewCard = formNewCard.querySelector('.popup__button');
@@ -111,6 +110,8 @@ formNewAvatar.addEventListener('submit', updateAvatar)
 //ДОБАВЛЕНИЕ НОВОЙ КАРТОЧКИ
 //Открытие окна добавления карточки
 addCardButton.addEventListener('click', () => {
+  newCardNameInput.value = '';
+  newCardUrlInput.value = '';
   openModal(popupAddCard)
   clearValidation(popupAddCard,validationConfig)
 });
@@ -173,7 +174,6 @@ const validationConfig = {
 // Вызовем функцию
 enableValidation(validationConfig);
 
-//Отображение количества лайков карточки и подгон к макету расположено в card__description.css
 
 
 
