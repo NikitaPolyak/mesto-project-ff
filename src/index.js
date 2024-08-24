@@ -2,7 +2,7 @@ import './pages/index.css';
 import { createCard, addLikeCard, deleteCard} from './scripts/card.js';
 import { openModal, closeModal} from './scripts/modal.js';
 import { getInfoUser, getCardsServer, updateUserData,addNewCard,updateAvatarServer} from './scripts/api.js';
-import { hideInputError, enableValidation, clearValidation} from './scripts/validation.js';
+import { enableValidation, clearValidation} from './scripts/validation.js';
 // @todo: DOM узлы
 
 const formElement = document.querySelector('.popup__form');
@@ -32,7 +32,7 @@ const buttonNewCard = formNewCard.querySelector('.popup__button');
 const popupAva = document.querySelector('.popup_type_new-avatar');
 const inputLinkAva = formNewAvatar.querySelector('.popup_type_link-new-avatar'); 
 
-
+let currentUserId;
 //Корректная загрузка страницы 
 function getInfoUserAndCards(){
   const promises = [getInfoUser(), getCardsServer()]
@@ -42,8 +42,9 @@ function getInfoUserAndCards(){
     job.textContent = userData.about
     avatar.style = `background-image: url('${userData.avatar}');`
 
+    currentUserId = userData._id;
     cardsData.forEach(function(element) {
-      placesList.append(createCard(element, deleteCard, addLikeCard, openCard))
+      placesList.append(createCard(element, currentUserId, deleteCard, addLikeCard, openCard))
     })
   })
   .catch((err) => {
@@ -84,7 +85,7 @@ formEditProfile.addEventListener('submit', handleFormSubmit);
 //Открытие окна редактирования аватарки
 avatar.addEventListener('click', ()=>{
   openModal(popupAva)
-  inputLinkAva.value = ''
+  formNewAvatar.reset()
   clearValidation(popupAva,validationConfig)
  })
 
@@ -110,8 +111,7 @@ formNewAvatar.addEventListener('submit', updateAvatar)
 //ДОБАВЛЕНИЕ НОВОЙ КАРТОЧКИ
 //Открытие окна добавления карточки
 addCardButton.addEventListener('click', () => {
-  newCardNameInput.value = '';
-  newCardUrlInput.value = '';
+  formNewCard.reset();
   openModal(popupAddCard)
   clearValidation(popupAddCard,validationConfig)
 });
@@ -123,10 +123,8 @@ const handleFormNewCardSubmit = (evt) => {
   const newCard = {name:newCardNameInput.value, link:newCardUrlInput.value};
   addNewCard(newCard)
   .then((data)=>{
-    placesList.prepend(createCard(data, deleteCard, addLikeCard, openCard));
-    console.log(data)
-    newCardNameInput.value = '';
-    newCardUrlInput.value = '';
+    placesList.prepend(createCard(data, currentUserId, deleteCard, addLikeCard, openCard));
+    formNewCard.reset();
     closeModal(popupAddCard);
   })
   .catch((err) => {
@@ -145,14 +143,11 @@ button.textContent = status ? 'Сохранение...' : 'Сохранить'
 }
 
 //Закрытие модальных окон при клике на крестик
-popupCloseButtonAll.forEach(evt => {
-  evt.addEventListener('click', () => {
-    const closePopup = evt.closest('.popup');
+popupCloseButtonAll.forEach((elem) => {
+  const closePopup = elem.closest('.popup');
+  elem.addEventListener('click', () => {
     closeModal(closePopup);
-    const inputList = Array.from(formElement.querySelectorAll('.popup__input'));
-    inputList.forEach((inputElement) => {
-      hideInputError(formElement,inputElement);
-    })
+    clearValidation(closePopup,validationConfig)
   })});
 
 //Открытие карточки
@@ -163,7 +158,7 @@ function openCard(elem){
   openModal(imageModal);
 };
 
-const validationConfig = {
+export const validationConfig = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
   submitButtonSelector: '.popup__button',

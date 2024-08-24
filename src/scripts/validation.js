@@ -1,3 +1,5 @@
+import { validationConfig } from '../index.js'
+
 // Функция, которая добавляет класс с ошибкой
 const showInputError = (formElement,inputElement,errorMessage,inputErrorClass,errorClass) => {
   const formError = formElement.querySelector(`.${inputElement.id}-error`);
@@ -48,14 +50,19 @@ const hasInvalidInput = (inputList) => {
   })
 };
 
+//Удаление дублирования кода
+const disableSubmitButton = (button, config) => {
+  button.disabled = config;
+  button.classList.add(validationConfig.inactiveButtonClass)
+}
+
 // Функция принимает массив полей ввода
 // и элемент кнопки, состояние которой нужно менять
 const toggleButtonState = (inputList, buttonElement,inactiveButtonClass) => {
   // Если есть хотя бы один невалидный инпут
   if (hasInvalidInput(inputList)) {
     // сделай кнопку неактивной
-      buttonElement.disabled = true;
-      buttonElement.classList.add(inactiveButtonClass);
+    disableSubmitButton(buttonElement,true)
   } else {
     // иначе сделай кнопку активной
       buttonElement.disabled = false;
@@ -82,28 +89,27 @@ const setEventListeners = (formElement,inputSelector,submitButtonSelector,inacti
   });
 };
 
-const enableValidation = (param) => {
+const enableValidation = (validationConfig) => {
   // Найдём все формы с указанным классом в DOM,
   // сделаем из них массив методом Array.from
   //const formList = Array.from(document.querySelectorAll('.popup__form'));
-  const formList = Array.from(document.querySelectorAll(param.formSelector));
+  const formList = Array.from(document.querySelectorAll(validationConfig.formSelector));
   // Переберём полученную коллекцию
   formList.forEach((formElement) => {
     // Для каждой формы вызовем функцию setEventListeners,
     // передав ей элемент формы
-    setEventListeners(formElement, param.inputSelector, param.submitButtonSelector,param.inactiveButtonClass,param.inputErrorClass,param.errorClass);
+    setEventListeners(formElement, validationConfig.inputSelector, validationConfig.submitButtonSelector,validationConfig.inactiveButtonClass,validationConfig.inputErrorClass,validationConfig.errorClass);
   });
 };
 
 // очистка ошибок валидации вызовом clearValidation
-const clearValidation = (elementForm, param) => {
-  const inputList = Array.from(elementForm.querySelectorAll(param.inputSelector))
-  const buttonElement = elementForm.querySelector(param.submitButtonSelector)
+const clearValidation = (elementForm, validationConfig) => {
+  const inputList = Array.from(elementForm.querySelectorAll(validationConfig.inputSelector))
+  const buttonElement = elementForm.querySelector(validationConfig.submitButtonSelector)
   inputList.forEach((elem)=>{
-   hideInputError(elementForm,elem,param.inputErrorClass,param.errorClass)
+   hideInputError(elementForm,elem,validationConfig.inputErrorClass,validationConfig.errorClass)
   })
-   buttonElement.disabled = true
-   buttonElement.classList.add(param.inactiveButtonClass)
+    disableSubmitButton(buttonElement,true)
  }
 
- export {hideInputError,enableValidation,clearValidation}
+ export {enableValidation,clearValidation}

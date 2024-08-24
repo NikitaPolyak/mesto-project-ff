@@ -1,3 +1,10 @@
+const config = {
+  baseUrl: 'https://nomoreparties.co/v1/pwff-cohort-1',
+  headers: {
+    authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
+    'Content-Type': 'application/json'
+  }
+}
 //Функция обработки response
 function handleResponse(res){
   if(res.ok){
@@ -10,34 +17,25 @@ function handleResponse(res){
 
 //Загрузка информации о пользователе с сервера
 function getInfoUser() {
-  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
-     headers: {
-       authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-       'Content-Type': 'application/json'
-     }
+  return fetch(`${config.baseUrl}/users/me`, { 
+     headers: config.headers
    })
    .then(handleResponse)
  }
 
  //Загрузка карточек с сервера
 function getCardsServer() {
-  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    }
+  return fetch(`${config.baseUrl}/cards`, {
+    headers: config.headers
   })
   .then(handleResponse)
 }
 
 //Редактирование профиля на сервере
 function updateUserData(name,about) {
-   return fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me', {
+   return fetch(`${config.baseUrl}/users/me`, {
     method: 'PATCH',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    },
+    headers: config.headers,
     body: JSON.stringify({
       name: name,
       about: about
@@ -48,12 +46,9 @@ function updateUserData(name,about) {
 
 //Добавление новой карточки с сервера 
 function addNewCard(newCard){
-  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/cards', {
+  return fetch(`${config.baseUrl}/cards`, {
     method: 'POST',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    },
+    headers: config.headers,
     body: JSON.stringify({
       name: newCard.name,
       link: newCard.link
@@ -64,48 +59,36 @@ function addNewCard(newCard){
 
 //Добавление like карточки на сервере
 function addLikeCardServer(cardId){
-  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/${cardId}`, {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: 'PUT',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    }
+    headers: config.headers
   })
   .then(handleResponse)
 }
 
 //Удаление like карточки на сервере
 function removeLikeCardServer(cardId){
-  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/likes/${cardId}`, {
+  return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: 'DELETE',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    }
+    headers: config.headers
   })
   .then(handleResponse)
 }
 
 //Удаление карточки с сервера
-function deleteCard(cardId) {
-  return fetch(`https://nomoreparties.co/v1/pwff-cohort-1/cards/${cardId}`, {
+function deleteCardServer(cardId) {
+  return fetch(`${config.baseUrl}/cards/${cardId}`, {
     method: 'DELETE',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    }
+    headers: config.headers
   })
   .then(handleResponse)
 }
 
 //Обновление аватара пользователя на сервере
 function updateAvatarServer(link) {
-  return fetch('https://nomoreparties.co/v1/pwff-cohort-1/users/me/avatar', {
+  return fetch(`${config.baseUrl}/users/me/avatar`, {
     method: 'PATCH',
-    headers: {
-      authorization: '1408693c-201a-41de-afd2-34fb2c62888a',
-      'Content-Type': 'application/json'
-    },
+    headers: config.headers,
     body: JSON.stringify({
       avatar: link
     })
@@ -113,4 +96,4 @@ function updateAvatarServer(link) {
   .then(handleResponse)
 }
 
-export {getCardsServer,getInfoUser,handleResponse,updateUserData,addNewCard,addLikeCardServer,removeLikeCardServer,deleteCard, updateAvatarServer};
+export {getCardsServer,getInfoUser,handleResponse,updateUserData,addNewCard,addLikeCardServer,removeLikeCardServer,deleteCardServer, updateAvatarServer};
